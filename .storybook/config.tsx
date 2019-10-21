@@ -2,7 +2,6 @@ import { checkA11y } from '@storybook/addon-a11y';
 import { configureActions } from '@storybook/addon-actions';
 import { withKnobs } from '@storybook/addon-knobs';
 import { addDecorator, addParameters, configure } from '@storybook/react';
-import { jsxDecorator } from 'storybook-addon-jsx';
 
 addParameters({
   options: {
@@ -17,7 +16,6 @@ configureActions({
   limit: 20,
 });
 
-addDecorator(jsxDecorator);
 addDecorator(withKnobs);
 addDecorator(checkA11y);
 

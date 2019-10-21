@@ -1,23 +1,67 @@
 import { storiesOf } from '@storybook/react';
-import React from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useState } from 'react';
 
-import { TestSource } from 'test/testsource';
+import { StatefulTreeNode, TreeState, useTree } from 'index';
+import { testSource } from 'test/testsource';
+
+interface Labeled {
+    label: string;
+}
 
 const stories = storiesOf('Tree', module);
 
+const src = testSource();
+
+interface IListProps {
+    items: Array<StatefulTreeNode<Labeled>>;
+    isLoading: boolean;
+    onSetExpanded(id: string, expanded: boolean): void;
+}
+
+const List: React.FC<IListProps> = React.memo(({ items, isLoading, onSetExpanded }) => {
+    return (
+        <ul>
+            {isLoading ? <li>loading...</li> : null}
+            {items.map((item) => (
+                <ListItem item={item} key={item.id} onSetExpanded={onSetExpanded} />
+            ))}
+        </ul>
+    );
+});
+
+interface IListItemProps {
+    item: StatefulTreeNode<Labeled>;
+    onSetExpanded(id: string, expanded: boolean): void;
+}
+
+const ListItem: React.FC<IListItemProps> = React.memo(({ item, onSetExpanded }) => {
+    const onClickExpanded = useCallback(() => {
+        onSetExpanded(item.id, !item.isExpanded);
+    }, [item, onSetExpanded]);
+    const subItems = item.isExpanded && item.hasChildren
+        ? <List items={item.children || []} isLoading={item.isLoadingChildren} onSetExpanded={onSetExpanded} />
+        : null;
+    return (
+        <li>
+            <button onClick={onClickExpanded}>{item.isExpanded ? '(-)' : '(+)'}</button> {item.label}
+            {subItems}
+        </li>
+    );
+});
+
+const emptyTreeState: TreeState = {};
+
 stories.add('Test', () => {
-    const src = new TestSource();
-    (async () => {
-        console.log('root', await src.children());
-        console.log('children abc', await src.children('abc'));
-        console.log('trail abc', await src.trail('abc'));
-        console.log('trail a', await src.trail('a'));
-        console.log('trail empty', await src.trail(''));
-    })();
+    const [treeState, setTreeState] = useState(emptyTreeState);
+    const tree = useTree(src, treeState);
+
+    const onSetExpanded = useCallback((id: string, expanded: boolean) => {
+        setTreeState((st: TreeState) => ({ ...st, expandedIds: { ...st.expandedIds, [id]: expanded } }));
+    }, [setTreeState]);
 
     return (
         <>
-            test
+            <List items={tree.rootNodes} isLoading={tree.isLoading} onSetExpanded={onSetExpanded} />
         </>
     );
  });

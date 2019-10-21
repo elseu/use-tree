@@ -126,10 +126,10 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<Statef
             return outputNode;
         }
 
-        const rootstatefulNodes = (rootNodes || []).map(buildOutputNode);
+        const rootStatefulNodes = (rootNodes || []).map(buildOutputNode);
 
         return {
-            rootNodes: rootstatefulNodes,
+            rootNodes: rootStatefulNodes,
             isLoading: rootNodes === null,
         };
     }, [activeId, expandedIds, rootNodes, children, activeTrailIds, statefulNodes, childrenLoading]);

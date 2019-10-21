@@ -13,7 +13,7 @@ configureActions({
   depth: 100,
   // Limit the number of items logged into the actions panel
   clearOnStoryChange: true,
-  limit: 20,
+  limit: 50,
 });
 
 addDecorator(withKnobs);

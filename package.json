@@ -1,0 +1,79 @@
+{
+  "name": "use-tree",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2"
+  },
+  "author": {
+    "name": "Sebastiaan Besselsen",
+    "email": "S.Besselsen@sdu.nl"
+  },
+  "scripts": {
+    "build": "rimraf dist; rollup -c; rimraf \"dist/*.stories.d.ts\"",
+    "dev": "start-storybook -p 6006",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "tslint --project .",
+    "lint-fix": "tslint --project . --fix",
+    "prepublishOnly": "npm run lint; npm run build",
+    "deploy": "semantic-release"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "react",
+    "hooks",
+    "react-hooks"
+  ],
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.3",
+    "@storybook/addon-a11y": "^5.2.3",
+    "@storybook/addon-actions": "^5.2.3",
+    "@storybook/addon-knobs": "^5.2.3",
+    "@storybook/addon-links": "^5.2.3",
+    "@storybook/addon-notes": "^5.2.3",
+    "@storybook/addons": "^5.2.3",
+    "@storybook/react": "^5.2.3",
+    "@types/jest": "24.0.18",
+    "@types/node": "12.7.12",
+    "@types/react": "16.9.5",
+    "@types/react-dom": "16.9.1",
+    "@types/storybook__react": "^4.0.2",
+    "eslint": "^6.5.1",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "react-scripts": "3.2.0",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.23.1",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-peer-deps-external": "^2.2.0",
+    "rollup-plugin-typescript2": "^0.24.3",
+    "rollup-plugin-url": "^3.0.0",
+    "semantic-release": "^15.13.24",
+    "storybook-addon-jsx": "^7.1.6",
+    "tslint": "^5.20.0",
+    "tslint-react": "^4.1.0",
+    "typescript": "^3.6.4"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "linterOptions": {
+    "exclude": [
+      "node_modules/**",
+      "dist/**"
+    ]
+  },
+  "extends": [
+    "tslint:latest",
+    "tslint-react"
+  ],
+  "rules": {
+    "object-literal-sort-keys": false,
+    "interface-name": false,
+    "quotemark": [true, "single", "jsx-double"],
+    "jsx-no-multiline-js": false,
+    "no-implicit-dependencies": [false],
+    "no-submodule-imports": [false]
+  }
+}

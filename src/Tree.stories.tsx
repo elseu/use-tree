@@ -1,4 +1,5 @@
 import { action } from '@storybook/addon-actions';
+import { text } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import React, { useCallback, useState } from 'react';
 
@@ -42,13 +43,13 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item, onSetExpanded }) 
     const onClickExpanded = useCallback(() => {
         onSetExpanded(item.id, !item.isExpanded);
     }, [item, onSetExpanded]);
-    const subItems = (item.isExpanded || item.isActiveTrail) && item.hasChildren
+    const subItems = item.isExpanded && item.hasChildren
         ? <List items={item.children || []} isLoading={item.isLoadingChildren} onSetExpanded={onSetExpanded} />
         : null;
     return (
         <li>
             <button onClick={onClickExpanded}>
-                {(item.isExpanded || item.isActiveTrail) ? '(-)' : '(+)'}
+                {item.isExpanded ? '(-)' : '(+)'}
             </button>
             {' '}
             {item.isActiveTrail
@@ -60,21 +61,28 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item, onSetExpanded }) 
     );
 });
 
-const emptyTreeState: TreeState = {
-    activeId: 'sebastiaan',
-};
+const emptyTreeState: TreeState = {};
 
-stories.add('Test', () => {
+const TreeContainer: React.FC<{ activeId?: string }> = ({ activeId }) => {
     const [treeState, setTreeState] = useState(emptyTreeState);
     const tree = useTree(src, treeState);
+    if (treeState.activeId !== activeId) {
+        setTreeState((st) => ({ ...st, activeId}));
+    }
 
     const onSetExpanded = useCallback((id: string, expanded: boolean) => {
         setTreeState((st: TreeState) => ({ ...st, expandedIds: { ...st.expandedIds, [id]: expanded } }));
     }, [setTreeState]);
 
     return (
+        <List items={tree.rootNodes} isLoading={tree.isLoading} onSetExpanded={onSetExpanded} />
+    );
+}
+
+stories.add('Test', () => {
+    return (
         <>
-            <List items={tree.rootNodes} isLoading={tree.isLoading} onSetExpanded={onSetExpanded} />
+            <TreeContainer activeId={text('Active ID', 'sebastiaan')} />
         </>
     );
  });

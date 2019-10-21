@@ -1,14 +1,38 @@
-import { useStatefulTree } from 'build/stateful-tree-builder';
-import { useEffect, useMemo, useState } from 'react';
-import { KeyedIndex } from 'types/common';
-import { StatefulTreeNode, Tree, TreeNode, TreeSource, TreeState } from 'types/tree';
-import { suffixes } from 'util/functional';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { StatefulTreeNode, Tree, TreeNode, TreeSource, TreeState } from 'types';
+
+interface KeyedIndex<V> {
+    [k: string]: V;
+}
+
+function suffixes<T>(arr: T[]): T[][] {
+    const output: T[][] = [];
+    for (let i = 0, len = arr.length; i < len; i++) {
+        output.push(arr.slice(i));
+    }
+    return output;
+}
+
+export function valuesEqual<T>(arr1: T[], arr2: T[]): boolean {
+    const len = arr1.length;
+    if (len !== arr2.length) {
+        return false;
+    }
+    for (let i = 0; i < len; i++) {
+        if (arr1[i] !== arr2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<StatefulTreeNode<T>> {
     const [rootNodes, setRootNodes] = useState<Array<TreeNode<T>> | null>(null);
     const [children, setChildren] = useState<KeyedIndex<Array<TreeNode<T>>>>({});
     const [childrenLoading, setChildrenLoading] = useState<KeyedIndex<boolean>>({});
     const [trails, setTrails] = useState<KeyedIndex<Array<TreeNode<T>>>>({});
+
+    const statefulNodes = useRef<KeyedIndex<StatefulTreeNode<T>>>({});
 
     const activeId = state.activeId;
     const expandedIds = state.expandedIds;
@@ -68,12 +92,45 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<Statef
         });
     }, [expandedIds, children, trails, activeTrailIds, source, childrenLoading]);
 
-    return useStatefulTree({
-        activeId,
-        activeTrailIds,
-        children,
-        childrenLoading,
-        expandedIds: expandedIds || {},
-        rootNodes,
-    });
+    return useMemo(() => {
+        const activeTrailIdsIndex = Object.fromEntries(activeTrailIds.map((id) => [id, true]));
+        const expandedIdsIndex = expandedIds || {};
+
+        function buildOutputNode(node: TreeNode<T>): StatefulTreeNode<T> {
+            const nodeId = node.id;
+            const current = statefulNodes.current[nodeId];
+            const mappedChildren = (children[nodeId] || []).map(buildOutputNode);
+            const isActive = activeId === nodeId;
+            const isActiveTrail = !!activeTrailIdsIndex[nodeId];
+            const isExpanded = expandedIdsIndex[nodeId] === true
+                || (isActiveTrail && expandedIdsIndex[nodeId] !== false);
+            const isLoadingChildren = !!childrenLoading[nodeId];
+            if (current
+                && current.isExpanded === isExpanded
+                && current.isActiveTrail === isActiveTrail
+                && current.isActive === isActive
+                && current.isLoadingChildren === isLoadingChildren
+                && valuesEqual(current.children, mappedChildren)) {
+                // Item is still up-to-date.
+                return current;
+            }
+            const outputNode = {
+                ...node,
+                isExpanded,
+                isActive,
+                isActiveTrail,
+                isLoadingChildren,
+                children: mappedChildren,
+            };
+            statefulNodes.current[nodeId] = outputNode;
+            return outputNode;
+        }
+
+        const rootstatefulNodes = (rootNodes || []).map(buildOutputNode);
+
+        return {
+            rootNodes: rootstatefulNodes,
+            isLoading: rootNodes === null,
+        };
+    }, [activeId, expandedIds, rootNodes, children, activeTrailIds, statefulNodes, childrenLoading]);
 }

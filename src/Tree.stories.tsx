@@ -2,7 +2,7 @@ import { text } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import React, { useState } from 'react';
 
-import { StatefulTree, StatefulTreeNode, TreeContainer, TreeState, useTreeContent, useTreeNodeController } from 'index';
+import { Tree, TreeContainer, TreeNode, TreeState, useTreeContent, useTreeNodeController } from 'index';
 
 // Generate strings 'a' through 'z'.
 function letterRange(): string[] {
@@ -49,7 +49,7 @@ interface Labeled {
 const stories = storiesOf('Tree', module);
 
 interface IListProps {
-    tree: StatefulTree<Labeled>;
+    tree: Tree<Labeled>;
 }
 
 const List: React.FC<IListProps> = React.memo(({ tree }) => {
@@ -64,7 +64,7 @@ const List: React.FC<IListProps> = React.memo(({ tree }) => {
 });
 
 interface IListItemProps {
-    item: StatefulTreeNode<Labeled>;
+    item: TreeNode<Labeled>;
 }
 
 const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {

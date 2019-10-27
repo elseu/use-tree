@@ -1,18 +1,16 @@
-export interface TreeData {
+export type TreeSourceNode<T> = T & {
     id: string;
     hasChildren: boolean;
-}
+};
 
-export type TreeNode<T> = T & TreeData;
-
-export interface Tree<T> {
-    items: Array<TreeNode<T>>;
+export interface LoadableArray<T> {
+    items: T[];
     isLoading: boolean;
 }
 
 export interface TreeSource<T> {
-    children(id?: string | null | undefined): Promise<Array<TreeNode<T>>>;
-    trail(id: string): Promise<Array<TreeNode<T>>>;
+    children(id?: string | null | undefined): Promise<Array<TreeSourceNode<T>>>;
+    trail(id: string): Promise<Array<TreeSourceNode<T>>>;
 }
 
 export interface TreeState {
@@ -20,13 +18,11 @@ export interface TreeState {
     expandedIds?: {[k: string]: boolean};
 }
 
-export interface TreeNodeState {
+export type TreeNode<T> = TreeSourceNode<T> & {
     isExpanded: boolean;
     isActive: boolean;
     isActiveTrail: boolean;
-    children: Tree<this>;
-}
+    children: LoadableArray<TreeNode<T>>;
+};
 
-export type StatefulTreeNode<T> = TreeNode<T> & TreeNodeState;
-
-export type StatefulTree<T> = Tree<StatefulTreeNode<T>>;
+export type Tree<T> = LoadableArray<TreeNode<T>>;

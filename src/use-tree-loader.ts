@@ -1,5 +1,6 @@
+import * as valuesEqual from 'array-equal';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StatefulTreeNode, Tree, TreeNode, TreeSource, TreeState, StatefulTree } from './types';
+import { LoadableArray, Tree, TreeNode, TreeSource, TreeSourceNode, TreeState } from './types';
 
 interface StringMap<V> {
     [k: string]: V;
@@ -13,25 +14,12 @@ function suffixes<T>(arr: T[]): T[][] {
     return output;
 }
 
-function valuesEqual<T>(arr1: T[], arr2: T[]): boolean {
-    const len = arr1.length;
-    if (len !== arr2.length) {
-        return false;
-    }
-    for (let i = 0; i < len; i++) {
-        if (arr1[i] !== arr2[i]) {
-            return false;
-        }
-    }
-    return true;
-}
+export function useTreeLoader<T>(source: TreeSource<T>, state: TreeState): Tree<T> {
+    const [rootNodes, setRootNodes] = useState<LoadableArray<TreeSourceNode<T>>>({ isLoading: true, items: [] });
+    const [children, setChildren] = useState<StringMap<LoadableArray<TreeSourceNode<T>>>>({});
+    const [trails, setTrails] = useState<StringMap<Array<TreeSourceNode<T>>>>({});
 
-export function useTree<T>(source: TreeSource<T>, state: TreeState): StatefulTree<T> {
-    const [rootNodes, setRootNodes] = useState<Tree<T>>({ isLoading: true, items: [] });
-    const [children, setChildren] = useState<StringMap<Tree<T>>>({});
-    const [trails, setTrails] = useState<StringMap<Array<TreeNode<T>>>>({});
-
-    const statefulNodes = useRef<StringMap<StatefulTreeNode<T>>>({});
+    const statefulNodes = useRef<StringMap<TreeNode<T>>>({});
 
     const { activeId, expandedIds } = state;
 
@@ -41,7 +29,7 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): StatefulTre
     , [activeId, trails]);
 
     // Add new trails and their sub trails.
-    const addTrails = useCallback((newTrails: Array<Array<TreeNode<T>>>) => {
+    const addTrails = useCallback((newTrails: Array<Array<TreeSourceNode<T>>>) => {
         setTrails((currentTrails) => {
             const newEntries = newTrails.map((trail) => [trail[0].id, trail]);
             return newEntries.length > 0 ? { ...currentTrails, ...Object.fromEntries(newEntries) } : currentTrails;
@@ -86,7 +74,7 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): StatefulTre
             idsToLoad.map((id) => source.children(id).then((items) => [id, { loading: false, items }])),
         ).then((results) => {
             // Add the children to state.
-            const loadedChildren: StringMap<Tree<T>> = Object.fromEntries(results);
+            const loadedChildren: StringMap<LoadableArray<TreeSourceNode<T>>> = Object.fromEntries(results);
             setChildren((currentChildren) => ({ ...currentChildren, ...loadedChildren }));
 
             // Add trails for the new children so we can make them active.
@@ -100,7 +88,7 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): StatefulTre
         const activeTrailIdsIndex = Object.fromEntries(activeTrailIds.map((id) => [id, true]));
         const expandedIdsIndex = expandedIds || {};
 
-        function buildOutputNode(node: TreeNode<T>): StatefulTreeNode<T> {
+        function buildOutputNode(node: TreeSourceNode<T>): TreeNode<T> {
             const nodeId = node.id;
             const current = statefulNodes.current[nodeId];
             const mappedChildren = (children[nodeId] ? children[nodeId].items : []).map(buildOutputNode);

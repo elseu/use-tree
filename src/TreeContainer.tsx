@@ -3,7 +3,7 @@ import { useBinding } from 'use-binding';
 import { TreeContentContext } from 'use-tree-content';
 import { noopUpdateState, TreeController, TreeControllerContext, treeControllerFromUpdateState } from 'use-tree-controller';
 import { TreeSource, TreeState } from './types';
-import { useTree } from './use-tree';
+import { useTreeLoader } from './use-tree-loader';
 
 interface TreeContainerProps<T> {
     source: TreeSource<T>;
@@ -17,7 +17,7 @@ export const TreeContainer: React.FC<TreeContainerProps<unknown>> = (props) => {
     const controller = useRef<TreeController>(treeControllerFromUpdateState(noopUpdateState));
     const [innerState, setInnerState] = useBinding(defaultState, state, setState, {});
 
-    const tree = useTree(source, innerState);
+    const tree = useTreeLoader(source, innerState);
 
     controller.current.updateState = useCallback((updater) => {
         setInnerState(updater(innerState));

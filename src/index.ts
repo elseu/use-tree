@@ -1,11 +1,11 @@
 export {
-    StatefulTree,
-    StatefulTreeNode,
+    Tree,
+    TreeNode,
     TreeState,
 } from './types';
 export {
-    useTree,
-} from './use-tree';
+    useTreeLoader as useTree,
+} from './use-tree-loader';
 export {
     TreeContentContext,
     useTreeContent,

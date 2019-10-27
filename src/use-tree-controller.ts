@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo } from 'react';
-import { TreeNode, TreeState } from './types';
+import { TreeSourceNode, TreeState } from './types';
 
 export interface TreeController {
     updateState(f: (st: TreeState) => TreeState): void;
@@ -46,8 +46,8 @@ export function useTreeController(): TreeController {
     return useContext(TreeControllerContext);
 }
 
-export function useTreeNodeController(item: string | TreeNode<unknown>): TreeNodeController {
-    const id = typeof item === 'string' ? item : (item as TreeNode<unknown>).id;
+export function useTreeNodeController(item: string | TreeSourceNode<unknown>): TreeNodeController {
+    const id = typeof item === 'string' ? item : (item as TreeSourceNode<unknown>).id;
     const controller = useTreeController();
     return useMemo(() => ({
         toggleExpanded() {

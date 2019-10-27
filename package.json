@@ -9,6 +9,14 @@
     "name": "Sebastiaan Besselsen",
     "email": "S.Besselsen@sdu.nl"
   },
+  "homepage": "https://github.com/sbesselsen/use-tree",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sbesselsen/use-tree.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sbesselsen/use-tree/issues"
+  },
   "scripts": {
     "build": "rimraf dist; rollup -c; rimraf \"dist/*.stories.d.ts\"",
     "dev": "start-storybook -p 6006",

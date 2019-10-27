@@ -2,7 +2,7 @@ import { text } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import React, { useState } from 'react';
 
-import { Tree, TreeContainer, TreeNode, TreeState, useTreeContent, useTreeNodeController } from 'index';
+import { Tree, TreeContainer, TreeNode, TreeState, useTreeNodeController } from 'index';
 
 // Generate strings 'a' through 'z'.
 function letterRange(): string[] {
@@ -88,11 +88,6 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
     );
 });
 
-const RootList: React.FC<{}> = ({ children }) => {
-    const tree = useTreeContent<Labeled>();
-    return <List tree={useTreeContent<Labeled>()} />;
-};
-
 const TreeExampleContainer: React.FC<{ activeId?: string }> = ({ activeId }) => {
     const [state, setState] = useState<TreeState>({ activeId });
     if (state.activeId !== activeId) {
@@ -100,9 +95,7 @@ const TreeExampleContainer: React.FC<{ activeId?: string }> = ({ activeId }) => 
     }
 
     return (
-        <TreeContainer source={testSource} state={state} setState={setState}>
-            <RootList />
-        </TreeContainer>
+        <TreeContainer source={testSource} state={state} setState={setState} rootElement={List} />
     );
 };
 

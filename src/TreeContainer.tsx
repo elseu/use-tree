@@ -1,8 +1,8 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, PropsWithChildren, ReactElement } from 'react';
 import { useBinding } from 'use-binding';
 import { TreeContentContext } from 'use-tree-content';
 import { noopUpdateState, TreeController, TreeControllerContext, treeControllerFromUpdateState } from 'use-tree-controller';
-import { TreeSource, TreeState } from './types';
+import { Tree, TreeSource, TreeState } from './types';
 import { useTreeLoader } from './use-tree-loader';
 
 interface TreeContainerProps<T> {
@@ -10,10 +10,11 @@ interface TreeContainerProps<T> {
     defaultState?: TreeState;
     state?: TreeState;
     setState?: (st: TreeState) => void;
+    rootElement?: React.FC<{ tree: Tree<T> }>;
 }
 
-export const TreeContainer: React.FC<TreeContainerProps<unknown>> = (props) => {
-    const { source, defaultState, state, setState, children } = props;
+export function TreeContainer<T>(props: PropsWithChildren<TreeContainerProps<T>>, context?: any): ReactElement | null {
+    const { source, defaultState, state, setState, rootElement, children } = props;
     const controller = useRef<TreeController>(treeControllerFromUpdateState(noopUpdateState));
     const [innerState, setInnerState] = useBinding(defaultState, state, setState, {});
 
@@ -26,7 +27,7 @@ export const TreeContainer: React.FC<TreeContainerProps<unknown>> = (props) => {
     return (
         <TreeContentContext.Provider value={tree}>
             <TreeControllerContext.Provider value={controller.current}>
-                {children}
+                {rootElement ? React.createElement(rootElement, { tree }) : children}
             </TreeControllerContext.Provider>
         </TreeContentContext.Provider>
     );

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, PropsWithChildren, ReactElement } from 'react';
+import React, { PropsWithChildren, ReactElement, useCallback, useRef } from 'react';
 import { useBinding } from 'use-binding';
 import { TreeContentContext } from 'use-tree-content';
 import { noopUpdateState, TreeController, TreeControllerContext, treeControllerFromUpdateState } from 'use-tree-controller';
@@ -31,4 +31,4 @@ export function TreeContainer<T>(props: PropsWithChildren<TreeContainerProps<T>>
             </TreeControllerContext.Provider>
         </TreeContentContext.Provider>
     );
-};
+}

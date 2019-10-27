@@ -28,7 +28,6 @@ export default {
     url(),
     resolve(),
     typescriptPlugin({
-      rollupCommonJSResolveHack: true,
       clean: true,
       typescript,
       exclude: ['**.test.tsx', '**.stories.tsx']

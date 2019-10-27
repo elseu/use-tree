@@ -1,4 +1,3 @@
-import * as valuesEqual from 'array-equal';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LoadableArray, Tree, TreeNode, TreeSource, TreeSourceNode, TreeState } from './types';
 
@@ -12,6 +11,22 @@ function suffixes<T>(arr: T[]): T[][] {
         output.push(arr.slice(i));
     }
     return output;
+}
+
+function valuesEqual(arr1: unknown[], arr2: unknown[]): boolean {
+    if (arr1 === arr2) {
+        return true;
+    }
+    const len = arr1.length;
+    if (arr2.length !== len) {
+        return false;
+    }
+    for (let i = 0; i < len; i++) {
+        if (arr1[i] !== arr2[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 export function useTreeLoader<T>(source: TreeSource<T>, state: TreeState): Tree<T> {

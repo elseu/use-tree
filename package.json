@@ -77,7 +77,6 @@
     "typescript": "^3.6.4"
   },
   "dependencies": {
-    "array-equal": "^1.0.0",
     "use-binding": "^1.0.0"
   },
   "version": "1.0.0"

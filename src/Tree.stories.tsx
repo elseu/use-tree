@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 
 import { Tree, TreeContainer, TreeNode, TreeState, useTreeNodeController } from 'index';
 
+/* tslint:disable:no-console */
+
 // Generate strings 'a' through 'z'.
 function letterRange(): string[] {
     return range(('a').charCodeAt(0), ('z').charCodeAt(0)).map((x) => String.fromCharCode(x));

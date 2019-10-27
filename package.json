@@ -75,5 +75,8 @@
     "tslint": "^5.20.0",
     "tslint-react": "^4.1.0",
     "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "use-binding": "^1.0.0"
   }
 }

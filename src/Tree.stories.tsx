@@ -3,7 +3,7 @@ import { text } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import React, { useCallback, useState } from 'react';
 
-import { useTree } from 'index';
+import { TreeContainer, useTreeContent, useTreeController } from 'TreeContainer';
 import { StatefulTreeNode, TreeState } from 'types';
 
 // Generate strings 'a' through 'z'.
@@ -50,20 +50,17 @@ interface Labeled {
 
 const stories = storiesOf('Tree', module);
 
-const renderAction = action('render');
-
 interface IListProps {
     items: Array<StatefulTreeNode<Labeled>>;
     isLoading: boolean;
-    onSetExpanded(id: string, expanded: boolean): void;
 }
 
-const List: React.FC<IListProps> = React.memo(({ items, isLoading, onSetExpanded }) => {
+const List: React.FC<IListProps> = React.memo(({ items, isLoading }) => {
     return (
         <ul>
             {isLoading ? <li>loading...</li> : null}
             {items.map((item) => (
-                <ListItem item={item} key={item.id} onSetExpanded={onSetExpanded} />
+                <ListItem item={item} key={item.id} />
             ))}
         </ul>
     );
@@ -71,16 +68,16 @@ const List: React.FC<IListProps> = React.memo(({ items, isLoading, onSetExpanded
 
 interface IListItemProps {
     item: StatefulTreeNode<Labeled>;
-    onSetExpanded(id: string, expanded: boolean): void;
 }
 
-const ListItem: React.FC<IListItemProps> = React.memo(({ item, onSetExpanded }) => {
-    // renderAction(item.label);
+const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
+    console.log('render', item.id);
+    const { setExpanded } = useTreeController();
     const onClickExpanded = useCallback(() => {
-        onSetExpanded(item.id, !item.isExpanded);
-    }, [item, onSetExpanded]);
+        setExpanded(item.id, !item.isExpanded);
+    }, [item, setExpanded]);
     const subItems = item.isExpanded && item.hasChildren
-        ? <List items={item.children || []} isLoading={item.isLoadingChildren} onSetExpanded={onSetExpanded} />
+        ? <List items={item.children || []} isLoading={item.isLoadingChildren} />
         : null;
     return (
         <li>
@@ -97,28 +94,28 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item, onSetExpanded }) 
     );
 });
 
-const emptyTreeState: TreeState = {};
+const RootList: React.FC<{}> = ({ children }) => {
+    const tree = useTreeContent<Labeled>();
+    return <List items={tree.rootNodes} isLoading={tree.isLoading} />;
+};
 
-const TreeContainer: React.FC<{ activeId?: string }> = ({ activeId }) => {
-    const [treeState, setTreeState] = useState(emptyTreeState);
-    const tree = useTree(testSource, treeState);
-    if (treeState.activeId !== activeId) {
-        setTreeState((st) => ({ ...st, activeId}));
+const TreeExampleContainer: React.FC<{ activeId?: string }> = ({ activeId }) => {
+    const [state, setState] = useState<TreeState>({ activeId });
+    if (state.activeId !== activeId) {
+        setState({ ...state, activeId });
     }
 
-    const onSetExpanded = useCallback((id: string, expanded: boolean) => {
-        setTreeState((st: TreeState) => ({ ...st, expandedIds: { ...st.expandedIds, [id]: expanded } }));
-    }, [setTreeState]);
-
     return (
-        <List items={tree.rootNodes} isLoading={tree.isLoading} onSetExpanded={onSetExpanded} />
+        <TreeContainer source={testSource} state={state} setState={setState}>
+            <RootList />
+        </TreeContainer>
     );
-}
+};
 
 stories.add('Test', () => {
     return (
         <>
-            <TreeContainer activeId={text('Active ID', 'sebastiaan')} />
+            <TreeExampleContainer activeId={text('Active ID', 'sebastiaan')} />
         </>
     );
  });

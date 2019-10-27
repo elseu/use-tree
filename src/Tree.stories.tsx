@@ -4,7 +4,7 @@ import { storiesOf } from '@storybook/react';
 import React, { useCallback, useState } from 'react';
 
 import { TreeContainer, useTreeContent, useTreeController } from 'TreeContainer';
-import { StatefulTreeNode, TreeState } from 'types';
+import { StatefulTreeNode, TreeState, Tree } from 'types';
 
 // Generate strings 'a' through 'z'.
 function letterRange(): string[] {
@@ -51,15 +51,14 @@ interface Labeled {
 const stories = storiesOf('Tree', module);
 
 interface IListProps {
-    items: Array<StatefulTreeNode<Labeled>>;
-    isLoading: boolean;
+    tree: Tree<StatefulTreeNode<Labeled>>;
 }
 
-const List: React.FC<IListProps> = React.memo(({ items, isLoading }) => {
+const List: React.FC<IListProps> = React.memo(({ tree }) => {
     return (
         <ul>
-            {isLoading ? <li>loading...</li> : null}
-            {items.map((item) => (
+            {tree.isLoading ? <li>loading...</li> : null}
+            {tree.items.map((item) => (
                 <ListItem item={item} key={item.id} />
             ))}
         </ul>
@@ -77,7 +76,7 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
         setExpanded(item.id, !item.isExpanded);
     }, [item, setExpanded]);
     const subItems = item.isExpanded && item.hasChildren
-        ? <List items={item.children || []} isLoading={item.isLoadingChildren} />
+        ? <List tree={item.children} />
         : null;
     return (
         <li>
@@ -96,7 +95,7 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
 
 const RootList: React.FC<{}> = ({ children }) => {
     const tree = useTreeContent<Labeled>();
-    return <List items={tree.rootNodes} isLoading={tree.isLoading} />;
+    return <List tree={tree} />;
 };
 
 const TreeExampleContainer: React.FC<{ activeId?: string }> = ({ activeId }) => {

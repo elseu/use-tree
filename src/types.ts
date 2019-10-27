@@ -6,7 +6,7 @@ export interface TreeData {
 export type TreeNode<T> = T & TreeData;
 
 export interface Tree<T> {
-    rootNodes: Array<TreeNode<T>>;
+    items: Array<TreeNode<T>>;
     isLoading: boolean;
 }
 
@@ -20,12 +20,11 @@ export interface TreeState {
     expandedIds?: {[k: string]: boolean};
 }
 
-export interface TreeNodeState {
+export interface TreeNodeState<T> {
     isExpanded: boolean;
     isActive: boolean;
     isActiveTrail: boolean;
-    isLoadingChildren: boolean;
-    children: this[];
+    children: Tree<StatefulTreeNode<T>>;
 }
 
-export type StatefulTreeNode<T> = TreeNode<T> & TreeNodeState;
+export type StatefulTreeNode<T> = TreeNode<T> & TreeNodeState<T>;

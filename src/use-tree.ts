@@ -5,11 +5,6 @@ interface StringMap<V> {
     [k: string]: V;
 }
 
-interface LoadableArray<T> {
-    items: T[];
-    loading: boolean;
-}
-
 function suffixes<T>(arr: T[]): T[][] {
     const output: T[][] = [];
     for (let i = 0, len = arr.length; i < len; i++) {
@@ -32,8 +27,8 @@ function valuesEqual<T>(arr1: T[], arr2: T[]): boolean {
 }
 
 export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<StatefulTreeNode<T>> {
-    const [rootNodes, setRootNodes] = useState<LoadableArray<TreeNode<T>>>({ loading: true, items: [] });
-    const [children, setChildren] = useState<StringMap<LoadableArray<TreeNode<T>>>>({});
+    const [rootNodes, setRootNodes] = useState<Tree<T>>({ isLoading: true, items: [] });
+    const [children, setChildren] = useState<StringMap<Tree<T>>>({});
     const [trails, setTrails] = useState<StringMap<Array<TreeNode<T>>>>({});
 
     const statefulNodes = useRef<StringMap<StatefulTreeNode<T>>>({});
@@ -56,7 +51,7 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<Statef
     // Load root nodes immediately.
     useEffect(() => {
         source.children(null).then((loadedRootNodes) => {
-            setRootNodes({ loading: false, items: loadedRootNodes });
+            setRootNodes({ isLoading: false, items: loadedRootNodes });
             addTrails(loadedRootNodes.map((child) => [child]));
         });
     }, [source, addTrails, setRootNodes]);
@@ -83,7 +78,7 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<Statef
 
         // Set a loading state for these IDs.
         setChildren((currentChildren) => ({
-            ...currentChildren, ...Object.fromEntries(idsToLoad.map((id) => [id, { loading: true, items: [] }])),
+            ...currentChildren, ...Object.fromEntries(idsToLoad.map((id) => [id, { isLoading: true, items: [] }])),
         }));
 
         // Load them from the source.
@@ -91,7 +86,7 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<Statef
             idsToLoad.map((id) => source.children(id).then((items) => [id, { loading: false, items }])),
         ).then((results) => {
             // Add the children to state.
-            const loadedChildren: StringMap<LoadableArray<TreeNode<T>>> = Object.fromEntries(results);
+            const loadedChildren: StringMap<Tree<T>> = Object.fromEntries(results);
             setChildren((currentChildren) => ({ ...currentChildren, ...loadedChildren }));
 
             // Add trails for the new children so we can make them active.
@@ -113,13 +108,13 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<Statef
             const isActiveTrail = !!activeTrailIdsIndex[nodeId];
             const isExpanded = expandedIdsIndex[nodeId] === true
                 || (isActiveTrail && expandedIdsIndex[nodeId] !== false); // TODO: do we really want this?
-            const isLoadingChildren = children[nodeId] && children[nodeId].loading;
+            const isLoadingChildren = children[nodeId] && children[nodeId].isLoading;
             if (current
                 && current.isExpanded === isExpanded
                 && current.isActiveTrail === isActiveTrail
                 && current.isActive === isActive
-                && current.isLoadingChildren === isLoadingChildren
-                && valuesEqual(current.children, mappedChildren)) {
+                && current.children.isLoading === isLoadingChildren
+                && valuesEqual(current.children.items, mappedChildren)) {
                 // Item is still up-to-date. Return the same instance to allow React.memo magic.
                 return current;
             }
@@ -128,16 +123,15 @@ export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<Statef
                 isExpanded,
                 isActive,
                 isActiveTrail,
-                isLoadingChildren,
-                children: mappedChildren,
+                children: { isLoading: isLoadingChildren, items: mappedChildren },
             };
             statefulNodes.current[nodeId] = outputNode;
             return outputNode;
         }
 
         return {
-            rootNodes: rootNodes.items.map(buildOutputNode),
-            isLoading: rootNodes.loading,
+            items: rootNodes.items.map(buildOutputNode),
+            isLoading: rootNodes.isLoading,
         };
     }, [activeId, expandedIds, rootNodes, children, activeTrailIds, statefulNodes]);
 }

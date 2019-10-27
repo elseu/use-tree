@@ -20,11 +20,13 @@ export interface TreeState {
     expandedIds?: {[k: string]: boolean};
 }
 
-export interface TreeNodeState<T> {
+export interface TreeNodeState {
     isExpanded: boolean;
     isActive: boolean;
     isActiveTrail: boolean;
-    children: Tree<StatefulTreeNode<T>>;
+    children: Tree<this>;
 }
 
-export type StatefulTreeNode<T> = TreeNode<T> & TreeNodeState<T>;
+export type StatefulTreeNode<T> = TreeNode<T> & TreeNodeState;
+
+export type StatefulTree<T> = Tree<StatefulTreeNode<T>>;

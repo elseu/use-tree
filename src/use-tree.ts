@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StatefulTreeNode, Tree, TreeNode, TreeSource, TreeState } from './types';
+import { StatefulTreeNode, Tree, TreeNode, TreeSource, TreeState, StatefulTree } from './types';
 
 interface StringMap<V> {
     [k: string]: V;
@@ -26,7 +26,7 @@ function valuesEqual<T>(arr1: T[], arr2: T[]): boolean {
     return true;
 }
 
-export function useTree<T>(source: TreeSource<T>, state: TreeState): Tree<StatefulTreeNode<T>> {
+export function useTree<T>(source: TreeSource<T>, state: TreeState): StatefulTree<T> {
     const [rootNodes, setRootNodes] = useState<Tree<T>>({ isLoading: true, items: [] });
     const [children, setChildren] = useState<StringMap<Tree<T>>>({});
     const [trails, setTrails] = useState<StringMap<Array<TreeNode<T>>>>({});

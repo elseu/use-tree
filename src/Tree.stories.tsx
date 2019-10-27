@@ -1,10 +1,8 @@
-import { action } from '@storybook/addon-actions';
 import { text } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 
-import { TreeContainer, useTreeContent, useTreeController } from 'TreeContainer';
-import { StatefulTreeNode, TreeState, Tree } from 'types';
+import { StatefulTree, StatefulTreeNode, TreeContainer, TreeState, useTreeContent, useTreeNodeController } from 'index';
 
 // Generate strings 'a' through 'z'.
 function letterRange(): string[] {
@@ -51,7 +49,7 @@ interface Labeled {
 const stories = storiesOf('Tree', module);
 
 interface IListProps {
-    tree: Tree<StatefulTreeNode<Labeled>>;
+    tree: StatefulTree<Labeled>;
 }
 
 const List: React.FC<IListProps> = React.memo(({ tree }) => {
@@ -71,16 +69,13 @@ interface IListItemProps {
 
 const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
     console.log('render', item.id);
-    const { setExpanded } = useTreeController();
-    const onClickExpanded = useCallback(() => {
-        setExpanded(item.id, !item.isExpanded);
-    }, [item, setExpanded]);
+    const { toggleExpanded } = useTreeNodeController(item);
     const subItems = item.isExpanded && item.hasChildren
         ? <List tree={item.children} />
         : null;
     return (
         <li>
-            <button onClick={onClickExpanded}>
+            <button onClick={toggleExpanded}>
                 {item.isExpanded ? '(-)' : '(+)'}
             </button>
             {' '}
@@ -95,7 +90,7 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
 
 const RootList: React.FC<{}> = ({ children }) => {
     const tree = useTreeContent<Labeled>();
-    return <List tree={tree} />;
+    return <List tree={useTreeContent<Labeled>()} />;
 };
 
 const TreeExampleContainer: React.FC<{ activeId?: string }> = ({ activeId }) => {

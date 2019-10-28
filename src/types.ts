@@ -9,7 +9,7 @@ export interface LoadableArray<T> {
 }
 
 export interface TreeSource<T> {
-    children(id?: string | null | undefined): Promise<Array<TreeSourceNode<T>>>;
+    children(id: string | null): Promise<Array<TreeSourceNode<T>>>;
     trail(id: string): Promise<Array<TreeSourceNode<T>>>;
 }
 
@@ -22,7 +22,7 @@ export type TreeNode<T> = TreeSourceNode<T> & {
     isExpanded: boolean;
     isActive: boolean;
     isActiveTrail: boolean;
-    children: LoadableArray<TreeNode<T>>;
+    children: Tree<T>;
 };
 
 export type Tree<T> = LoadableArray<TreeNode<T>>;

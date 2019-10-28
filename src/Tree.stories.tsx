@@ -21,7 +21,7 @@ async function timeout(ms) {
 }
 
 const testSource = {
-    async children(id?: string | null | undefined) {
+    async children(id: string | null) {
         console.log('source load children', id);
         const parentId = id || '';
         await timeout(100);
@@ -97,7 +97,7 @@ const TreeExampleContainer: React.FC<{ activeId?: string }> = ({ activeId }) => 
     }
 
     return (
-        <TreeContainer source={testSource} state={state} setState={setState} rootElement={List} />
+        <TreeContainer source={testSource} state={state} onStateChange={setState} rootElement={List} />
     );
 };
 

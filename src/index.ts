@@ -1,6 +1,7 @@
 export {
     Tree,
     TreeNode,
+    TreeSource,
     TreeState,
 } from './types';
 export {

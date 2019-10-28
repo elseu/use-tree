@@ -9,14 +9,14 @@ interface TreeContainerProps<T> {
     source: TreeSource<T>;
     defaultState?: TreeState;
     state?: TreeState;
-    setState?: (st: TreeState) => void;
+    onStateChange?: (st: TreeState) => void;
     rootElement?: React.FC<{ tree: Tree<T> }>;
 }
 
 export function TreeContainer<T>(props: PropsWithChildren<TreeContainerProps<T>>, context?: any): ReactElement | null {
-    const { source, defaultState, state, setState, rootElement, children } = props;
+    const { source, defaultState, state, onStateChange, rootElement, children } = props;
     const controller = useRef<TreeController>(treeControllerFromUpdateState(noopUpdateState));
-    const [innerState, setInnerState] = useBinding(defaultState, state, setState, {});
+    const [innerState, setInnerState] = useBinding(defaultState, state, onStateChange, {});
 
     const tree = useTreeLoader(source, innerState);
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { LoadableArray, Tree, TreeNode, TreeSource, TreeSourceNode, TreeState } from './types';
+import { LoadableArray, RootTree, TreeNode, TreeSource, TreeSourceNode, TreeState } from './types';
 
 interface StringMap<V> {
     [k: string]: V;
@@ -29,7 +29,7 @@ function valuesEqual(arr1: unknown[], arr2: unknown[]): boolean {
     return true;
 }
 
-export function useTreeLoader<T>(source: TreeSource<T>, state: TreeState): Tree<T> {
+export function useTreeLoader<T>(source: TreeSource<T>, state: TreeState): RootTree<T> {
     const [rootNodes, setRootNodes] = useState<LoadableArray<TreeSourceNode<T>>>({ isLoading: true, items: [] });
     const [children, setChildren] = useState<StringMap<LoadableArray<TreeSourceNode<T>>>>({});
     const [trails, setTrails] = useState<StringMap<Array<TreeSourceNode<T>>>>({});
@@ -135,6 +135,7 @@ export function useTreeLoader<T>(source: TreeSource<T>, state: TreeState): Tree<
         return {
             items: rootNodes.items.map(buildOutputNode),
             isLoading: rootNodes.isLoading,
+            allNodes: statefulNodes.current,
         };
     }, [activeId, expandedIds, rootNodes, children, activeTrailIds, statefulNodes]);
 }

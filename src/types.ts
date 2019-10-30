@@ -26,3 +26,7 @@ export type TreeNode<T> = TreeSourceNode<T> & {
 };
 
 export type Tree<T> = LoadableArray<TreeNode<T>>;
+
+export type RootTree<T> = Tree<T> & {
+    allNodes: {[k: string]: TreeNode<T>};
+};

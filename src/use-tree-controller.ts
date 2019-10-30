@@ -27,10 +27,15 @@ export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdat
         }));
     };
     obj.toggleExpanded = (id: string) => {
-        obj.updateState!(({ expandedIds, ...rest }) => ({
-            ...rest,
-            expandedIds: { ...expandedIds, [id]: !expandedIds || !expandedIds[id] },
-        }));
+        obj.updateState!(({ expandedIds, ...rest }, { allNodes }) => {
+            const explicitExpandedState = expandedIds ? expandedIds[id] : undefined;
+            const isExpanded = (explicitExpandedState === true)
+                || (allNodes[id] && allNodes[id].isActiveTrail && explicitExpandedState === undefined);
+            return {
+                ...rest,
+                expandedIds: { ...expandedIds, [id]: !isExpanded },
+            };
+        });
     };
     obj.setActiveId = (id: string | null) => {
         obj.updateState!((st) => ({ ...st, activeId: id }));

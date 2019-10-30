@@ -16,6 +16,7 @@ With `useTree` you can focus on how to render your tree structure and forget abo
   - [useTreeContent()](#usetreecontent)
   - [useTreeLoader()](#usetreeloader)
 - [Rendering a tree](#rendering-a-tree)
+  - [Type RootTree<T>](#type-roottreet)
   - [Type Tree<T>](#type-treet)
   - [Type TreeNode<T>](#type-treenodet)
 - [Typescript](#typescript)
@@ -89,7 +90,7 @@ This interface describes the current display state of a tree. It contains two pr
 ### useTreeController()
 Get an object that lets you control the current tree (from context). Provides these methods:
 
-* `updateState(updater: (oldState: TreeState) => TreeState): void`: update the tree state with your own updater function.
+* `updateState(updater: (oldState: TreeState, tree: RootTree<T>) => TreeState): void`: update the tree state with your own updater function.
 * `setExpanded(id: string, expanded?: boolean): void`: expanded or collapse a tree node.
 * `toggleExpanded(id: string): void`: toggle the expanded state of a tree node.
 * `setActiveId(id: string | null): void`: set which (if any) tree node is active.
@@ -105,13 +106,17 @@ Same as `useTreeController()`, but only for one tree node. You should, for insta
 When used inside the context of a tree, returns the current data of the tree. This can be used if you have several components nested inside your `<TreeContainer>` that all want to display the tree (or parts thereof).
 
 ### useTreeLoader()
-Use this if you want full control and don't want to use `TreeContainer`. This hook takes a `TreeSource` and a `TreeState` and returns the most up-to-date tree data structure. It will load data from the source if necessary and re-render as that data comes in.
+Use this if you want full control and don't want to use `TreeContainer`. This hook takes a `TreeSource` and a `TreeState` and returns the most up-to-date tree data structure with type `RootTree<T>`. It will load data from the source if necessary and re-render as that data comes in.
 
 ## Rendering a tree
 When rendering a tree through the `rootElement` of `TreeContainer` or by passing the result of `useTreeLoader()` directly to your component, your component should accept these data types. We will assume that your `TreeSource` is of type `TreeSource<T>` where `T` is your own type that contains your own properties for tree nodes.
 
 Root element properties:
-* `tree: Tree<T>`
+* `tree: RootTree<T>`
+
+### Type RootTree<T>
+* All properties from `Tree<T>`
+* `allNodes: {[k: string]: TreeNode<T>}`: all currently loaded tree nodes, indexed by ID.
 
 ### Type Tree<T>
 * `isLoading: boolean`: whether the items are still being loaded.

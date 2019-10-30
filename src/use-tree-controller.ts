@@ -1,8 +1,10 @@
 import { createContext, useContext, useMemo } from 'react';
-import { TreeSourceNode, TreeState } from './types';
+import { RootTree, TreeSourceNode, TreeState } from './types';
 
-export interface TreeController {
-    updateState(f: (st: TreeState) => TreeState): void;
+type TreeStateUpdater<T> = (state: TreeState, tree: RootTree<T>) => TreeState;
+
+export interface TreeController<T> {
+    updateState(f: TreeStateUpdater<T>): void;
     toggleExpanded(id: string): void;
     setExpanded(id: string, expanded?: boolean): void;
     setActiveId(id: string | null): void;
@@ -14,8 +16,8 @@ export interface TreeNodeController {
     setActive(active?: boolean): void;
 }
 
-export function treeControllerFromUpdateState(updateState: (f: (st: TreeState) => TreeState) => void): TreeController {
-    const obj: Partial<TreeController> = {
+export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdater<T>) => void): TreeController<T> {
+    const obj: Partial<TreeController<T>> = {
         updateState,
     };
     obj.setExpanded = (id: string, expanded?: boolean) => {
@@ -33,16 +35,16 @@ export function treeControllerFromUpdateState(updateState: (f: (st: TreeState) =
     obj.setActiveId = (id: string | null) => {
         obj.updateState!((st) => ({ ...st, activeId: id }));
     };
-    return obj as TreeController;
+    return obj as TreeController<T>;
 }
 
-export const noopUpdateState = (f: (st: TreeState) => TreeState) => { /* noop */ };
+export const noopUpdateState = <T, >(f: TreeStateUpdater<T>) => { /* noop */ };
 
 export const noopTreeController = treeControllerFromUpdateState(noopUpdateState);
 
-export const TreeControllerContext = createContext<TreeController>(noopTreeController);
+export const TreeControllerContext = createContext<TreeController<unknown>>(noopTreeController);
 
-export function useTreeController(): TreeController {
+export function useTreeController(): TreeController<unknown> {
     return useContext(TreeControllerContext);
 }
 

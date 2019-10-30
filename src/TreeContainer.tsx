@@ -15,14 +15,14 @@ interface TreeContainerProps<T> {
 
 export function TreeContainer<T>(props: PropsWithChildren<TreeContainerProps<T>>, context?: any): ReactElement | null {
     const { source, defaultState, state, onStateChange, rootElement, children } = props;
-    const controller = useRef<TreeController>(treeControllerFromUpdateState(noopUpdateState));
+    const controller = useRef<TreeController<unknown>>(treeControllerFromUpdateState(noopUpdateState));
     const [innerState, setInnerState] = useBinding(defaultState, state, onStateChange, {});
 
     const tree = useTreeLoader(source, innerState);
 
     controller.current.updateState = useCallback((updater) => {
-        setInnerState(updater(innerState));
-    }, [innerState, setInnerState]);
+        setInnerState(updater(innerState, tree));
+    }, [innerState, setInnerState, tree]);
 
     return (
         <TreeContentContext.Provider value={tree}>

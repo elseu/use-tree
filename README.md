@@ -70,6 +70,7 @@ Properties:
 * `state?: TreeState`: the current state of the tree. Pass this to use `TreeContainer` in controlled mode. This property tells `useTree` which tree nodes are expanded and which (if any) is active. If you pass a new state, `useTree` will update the tree data immediately and load the required data.
 * * `defaultState?: TreeState`: the state to start with. If you pass this, but not `state`, then `TreeContainer` will manage state internally (uncontrolled).
 * `onStateChange?: (st: TreeState) => void`: called whenever the tree state changes from within (usually through `useTreeController()`). Use this if you want to manage tree state in your own state container (like Redux).
+* `loaderOptions?: TreeLoaderOptions`: options for loading data from the tree source. See [useTreeLoader()](#usetreeloader).
 
 ### interface TreeSource
 Interface for a data source to fetch tree data, usually from a server. A data source should implement these two methods:
@@ -114,6 +115,10 @@ When used inside the context of a tree, returns the current data of the tree. Th
 
 ### useTreeLoader()
 Use this if you want full control and don't want to use `TreeContainer`. This hook takes a `TreeSource` and a `TreeState` and returns the most up-to-date tree data structure with type `RootTree<T>`. It will load data from the source if necessary and re-render as that data comes in.
+
+The third argument to this hook is an optional `TreeLoaderOptions`. These options are as follows:
+
+* `loadingTransitionMs?: number`: if set, `isLoading` on the children element of a node will only be set after we have been loading for the specified number of milliseconds. This prevents jarring unnecessary loading animations if data is usually loaded very quickly.
 
 ## Rendering a tree
 When rendering a tree through the `rootElement` of `TreeContainer` or by passing the result of `useTreeLoader()` directly to your component, your component should accept these data types. We will assume that your `TreeSource` is of type `TreeSource<T>` where `T` is your own type that contains your own properties for tree nodes.

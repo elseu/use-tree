@@ -1,4 +1,4 @@
-import { text } from '@storybook/addon-knobs';
+import { text, number } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import React, { useState } from 'react';
 
@@ -26,7 +26,7 @@ const testSource = {
     async children(id: string | null) {
         console.log('source load children', id);
         const parentId = id || '';
-        await timeout(100);
+        await timeout(100 + Math.random() * 1000);
         return letterRange().map((x) => ({
             id: parentId + x,
             label: parentId + x,
@@ -35,7 +35,7 @@ const testSource = {
     },
     async trail(id: string) {
         console.log('source load trail', id);
-        await timeout(100);
+        await timeout(100 + Math.random() * 1000);
         return range(1, id.length).reverse().map((length) => {
             return {
                 id: id.substr(0, length),
@@ -134,21 +134,38 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
     );
 });
 
-const TreeExampleContainer: React.FC<{ source: TreeSource<Labeled>, activeId?: string }> = ({ activeId, source }) => {
+interface TreeExampleContainerProps {
+    source: TreeSource<Labeled>;
+    activeId?: string;
+    loadingTransitionMs?: number;
+}
+
+const TreeExampleContainer: React.FC<TreeExampleContainerProps> = (props) => {
+    const { activeId, source, loadingTransitionMs = 0 } = props;
     const [state, setState] = useState<TreeState>({ activeId });
     if (state.activeId !== activeId) {
         setState({ ...state, activeId });
     }
 
     return (
-        <TreeContainer source={source} state={state} onStateChange={setState} rootElement={List} />
+        <TreeContainer
+            source={source}
+            state={state}
+            onStateChange={setState}
+            rootElement={List}
+            loaderOptions={{loadingTransitionMs}}
+        />
     );
 };
 
 stories.add('Test', () => {
     return (
         <>
-            <TreeExampleContainer source={testSource} activeId={text('Active ID', 'sebastiaan')} />
+            <TreeExampleContainer
+                source={testSource}
+                activeId={text('Active ID', 'sebastiaan')}
+                loadingTransitionMs={number('Loading transition ms', 100)}
+            />
         </>
     );
  });
@@ -156,7 +173,11 @@ stories.add('Test', () => {
 stories.add('Static', () => {
     return (
         <>
-            <TreeExampleContainer source={staticSource} activeId={text('Active ID', 'schaap-blaat-aap')} />
+        <TreeExampleContainer
+            source={staticSource}
+            activeId={text('Active ID', 'schaap-blaat-aap')}
+            loadingTransitionMs={number('Loading transition ms', 100)}
+        />
         </>
     );
  });

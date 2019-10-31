@@ -29,7 +29,16 @@ function valuesEqual(arr1: unknown[], arr2: unknown[]): boolean {
     return true;
 }
 
-export function useTreeLoader<T>(source: TreeSource<T>, state: TreeState): RootTree<T> {
+export interface TreeLoaderOptions {
+    loadingTransitionMs?: number;
+}
+
+export function useTreeLoader<T>(
+    source: TreeSource<T>,
+    state: TreeState,
+    options?: TreeLoaderOptions | null,
+): RootTree<T> {
+    const { loadingTransitionMs = 0 } = options || {};
     const [rootNodes, setRootNodes] = useState<LoadableArray<TreeSourceNode<T>>>({ isLoading: true, items: [] });
     const [children, setChildren] = useState<StringMap<LoadableArray<TreeSourceNode<T>>>>({});
     const [trails, setTrails] = useState<StringMap<Array<TreeSourceNode<T>>>>({});
@@ -79,15 +88,28 @@ export function useTreeLoader<T>(source: TreeSource<T>, state: TreeState): RootT
             return;
         }
 
+        const enableChildrenLoadingState = () => {
+                setChildren((currentChildren) => ({
+                ...currentChildren, ...Object.fromEntries(idsToLoad.map((id) => [id, { isLoading: true, items: [] }])),
+            }));
+        };
+        let loadingTransitionTimeout: unknown | null = null;
+
         // Set a loading state for these IDs.
-        setChildren((currentChildren) => ({
-            ...currentChildren, ...Object.fromEntries(idsToLoad.map((id) => [id, { isLoading: true, items: [] }])),
-        }));
+        if (loadingTransitionMs > 0) {
+            loadingTransitionTimeout = setTimeout(enableChildrenLoadingState, loadingTransitionMs);
+        } else {
+            enableChildrenLoadingState();
+        }
 
         // Load them from the source.
         Promise.all(
             idsToLoad.map((id) => source.children(id).then((items) => [id, { loading: false, items }])),
         ).then((results) => {
+            if (loadingTransitionTimeout !== null) {
+                clearTimeout(loadingTransitionTimeout as any);
+            }
+
             // Add the children to state.
             const loadedChildren: StringMap<LoadableArray<TreeSourceNode<T>>> = Object.fromEntries(results);
             setChildren((currentChildren) => ({ ...currentChildren, ...loadedChildren }));

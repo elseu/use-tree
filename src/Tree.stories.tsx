@@ -1,4 +1,4 @@
-import { text, number } from '@storybook/addon-knobs';
+import { number, text } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import React, { useState } from 'react';
 

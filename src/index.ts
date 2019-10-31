@@ -21,3 +21,6 @@ export {
     useTreeController,
     useTreeNodeController,
 } from './use-tree-controller';
+export {
+    staticTreeSource,
+} from './static-tree-source';

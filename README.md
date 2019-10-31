@@ -10,6 +10,7 @@ With `useTree` you can focus on how to render your tree structure and forget abo
 - [Components and hooks](#components-and-hooks)
   - [TreeContainer](#treecontainer)
   - [interface TreeSource](#interface-treesource)
+- [staticTreeSource()](#statictreesource)
   - [interface TreeState](#interface-treestate)
   - [useTreeController()](#usetreecontroller)
   - [useTreeNodeController(id: string)](#usetreenodecontrollerid-string)
@@ -80,6 +81,12 @@ Type `TreeSourceNode<T>` contains all the properties of `T` (which is a type tha
 
 * `id: string`: a unique identifier (within the tree) of the node.
 * `hasChildren: boolean`: whether or not this node has child elements.
+
+## staticTreeSource()
+If you have the full content of the tree available in an object and you don't need lazy loading, you can use `staticTreeSource(data)` to turn it into a `TreeSource`. Your `data` must be an array of root nodes which conform to `StaticTreeSourceNode<T>`:
+
+* All properties from `TreeSourceNode<T>`
+* `children: Array<StaticTreeSourceNode<T>>`
 
 ### interface TreeState
 This interface describes the current display state of a tree. It contains two properties:

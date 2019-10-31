@@ -3,6 +3,8 @@ import { storiesOf } from '@storybook/react';
 import React, { useState } from 'react';
 
 import { Tree, TreeContainer, TreeNode, TreeState, useTreeNodeController } from 'index';
+import { staticTreeSource } from 'static-tree-source';
+import { TreeSource } from 'types';
 
 /* tslint:disable:no-console */
 
@@ -43,6 +45,48 @@ const testSource = {
         });
     },
 };
+
+const staticSource = staticTreeSource<Labeled>([
+    {
+        id: 'aap',
+        label: 'Aap',
+        hasChildren: false,
+        children: [],
+    },
+    {
+        id: 'schaap',
+        label: 'Schaap',
+        hasChildren: true,
+        children: [
+            {
+                id: 'schaap-aap',
+                label: 'Schaap/aap',
+                hasChildren: true,
+                children: [
+                    {
+                        id: 'schaap-aap-aap',
+                        label: 'Schaap/aap/aap',
+                        hasChildren: false,
+                        children: [],
+                    },
+                ],
+            },
+            {
+                id: 'schaap-blaat',
+                label: 'Schaap/blaat',
+                hasChildren: true,
+                children: [
+                    {
+                        id: 'schaap-blaat-aap',
+                        label: 'Schaap/blaat/aap',
+                        hasChildren: false,
+                        children: [],
+                    },
+                ],
+            },
+        ],
+    },
+]);
 
 interface Labeled {
     label: string;
@@ -90,21 +134,29 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
     );
 });
 
-const TreeExampleContainer: React.FC<{ activeId?: string }> = ({ activeId }) => {
+const TreeExampleContainer: React.FC<{ source: TreeSource<Labeled>, activeId?: string }> = ({ activeId, source }) => {
     const [state, setState] = useState<TreeState>({ activeId });
     if (state.activeId !== activeId) {
         setState({ ...state, activeId });
     }
 
     return (
-        <TreeContainer source={testSource} state={state} onStateChange={setState} rootElement={List} />
+        <TreeContainer source={source} state={state} onStateChange={setState} rootElement={List} />
     );
 };
 
 stories.add('Test', () => {
     return (
         <>
-            <TreeExampleContainer activeId={text('Active ID', 'sebastiaan')} />
+            <TreeExampleContainer source={testSource} activeId={text('Active ID', 'sebastiaan')} />
+        </>
+    );
+ });
+
+stories.add('Static', () => {
+    return (
+        <>
+            <TreeExampleContainer source={staticSource} activeId={text('Active ID', 'schaap-blaat-aap')} />
         </>
     );
  });

@@ -141,6 +141,7 @@ Root element properties:
 * `isExpanded: boolean`
 * `isActive: boolean`
 * `isActiveTrail: boolean`
+* `depth: number`
 * `children: Tree<T>`
 
 ## Typescript

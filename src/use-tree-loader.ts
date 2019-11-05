@@ -119,7 +119,7 @@ export function useTreeLoader<T>(
                 ([id, childrenForId]) => childrenForId.items.map((child) => [child, ...trails[id]]),
             ));
         });
-    }, [expandedIds, children, trails, activeTrailIds, source, addTrails, setChildren]);
+    }, [expandedIds, children, trails, activeTrailIds, source, addTrails, setChildren, loadingTransitionMs]);
 
     return useMemo(() => {
         const activeTrailIdsIndex = Object.fromEntries(activeTrailIds.map((id) => [id, true]));

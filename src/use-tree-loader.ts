@@ -125,10 +125,11 @@ export function useTreeLoader<T>(
         const activeTrailIdsIndex = Object.fromEntries(activeTrailIds.map((id) => [id, true]));
         const expandedIdsIndex = expandedIds || {};
 
-        function buildOutputNode(node: TreeSourceNode<T>): TreeNode<T> {
+        function buildOutputNode(node: TreeSourceNode<T>, depth: number): TreeNode<T> {
             const nodeId = node.id;
             const current = statefulNodes.current[nodeId];
-            const mappedChildren = (children[nodeId] ? children[nodeId].items : []).map(buildOutputNode);
+            const mappedChildren = (children[nodeId] ? children[nodeId].items : [])
+                .map((child) => buildOutputNode(child, depth + 1));
             const isActive = activeId === nodeId;
             const isActiveTrail = !!activeTrailIdsIndex[nodeId];
             const isExpanded = expandedIdsIndex[nodeId] === true
@@ -138,6 +139,7 @@ export function useTreeLoader<T>(
                 && current.isExpanded === isExpanded
                 && current.isActiveTrail === isActiveTrail
                 && current.isActive === isActive
+                && current.depth === depth
                 && current.children.isLoading === isLoadingChildren
                 && valuesEqual(current.children.items, mappedChildren)) {
                 // Item is still up-to-date. Return the same instance to allow React.memo magic.
@@ -148,6 +150,7 @@ export function useTreeLoader<T>(
                 isExpanded,
                 isActive,
                 isActiveTrail,
+                depth,
                 children: { isLoading: isLoadingChildren, items: mappedChildren },
             };
             statefulNodes.current[nodeId] = outputNode;
@@ -155,7 +158,7 @@ export function useTreeLoader<T>(
         }
 
         return {
-            items: rootNodes.items.map(buildOutputNode),
+            items: rootNodes.items.map((item) => buildOutputNode(item, 0)),
             isLoading: rootNodes.isLoading,
             allNodes: statefulNodes.current,
         };

@@ -129,6 +129,7 @@ const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
                 ? (item.isActive ? <strong>{item.label}</strong> : <em>{item.label}</em>)
                 : item.label
             }
+            {` (${item.depth})`}
             {subItems}
         </li>
     );

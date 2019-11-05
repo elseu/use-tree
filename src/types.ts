@@ -22,6 +22,7 @@ export type TreeNode<T> = TreeSourceNode<T> & {
     isExpanded: boolean;
     isActive: boolean;
     isActiveTrail: boolean;
+    depth: number;
     children: Tree<T>;
 };
 

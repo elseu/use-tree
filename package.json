@@ -82,7 +82,7 @@
     "storybook-addon-jsx": "^7.1.6",
     "tslint": "^5.20.0",
     "tslint-react": "^4.1.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   },
   "dependencies": {
     "use-binding": "^1.0.0"

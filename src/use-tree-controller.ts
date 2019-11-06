@@ -28,9 +28,9 @@ export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdat
     };
     obj.toggleExpanded = (id: string) => {
         obj.updateState!(({ expandedIds, ...rest }, { allNodes }) => {
-            const explicitExpandedState = expandedIds ? expandedIds[id] : undefined;
+            const explicitExpandedState = expandedIds?.[id];
             const isExpanded = (explicitExpandedState === true)
-                || (allNodes[id] && allNodes[id].isActiveTrail && explicitExpandedState === undefined);
+                || (allNodes?.[id].isActiveTrail && explicitExpandedState === undefined);
             return {
                 ...rest,
                 expandedIds: { ...expandedIds, [id]: !isExpanded },

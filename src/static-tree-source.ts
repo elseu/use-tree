@@ -14,12 +14,12 @@ class StaticTreeSource<T> implements TreeSource<T> {
     constructor(data: Array<StaticTreeSourceNode<T>>) {
         this.rootElements = data;
         const walkTree = (children: Array<StaticTreeSourceNode<T>>, trail: Array<StaticTreeSourceNode<T>>) => {
-            const parentId = trail[0] ? trail[0].id : null;
-            if (parentId !== null) {
+            const parentId = trail[0]?.id;
+            if (parentId !== undefined) {
                 this.childrenData[parentId] = [];
             }
             for (const child of children) {
-                if (parentId !== null) {
+                if (parentId !== undefined) {
                     this.childrenData[parentId].push(child);
                 }
                 const childTrail = [child, ...trail];

@@ -33,17 +33,30 @@ export interface TreeLoaderOptions {
     loadingTransitionMs?: number;
 }
 
+const initialRootNodes = { isLoading: true, items: [] };
+const initialChildren = {};
+const initialTrails = {};
+
 export function useTreeLoader<T>(
     source: TreeSource<T>,
     state: TreeState,
     options?: TreeLoaderOptions | null,
 ): RootTree<T> {
     const { loadingTransitionMs = 0 } = options || {};
-    const [rootNodes, setRootNodes] = useState<LoadableArray<TreeSourceNode<T>>>({ isLoading: true, items: [] });
-    const [children, setChildren] = useState<StringMap<LoadableArray<TreeSourceNode<T>>>>({});
-    const [trails, setTrails] = useState<StringMap<Array<TreeSourceNode<T>>>>({});
+    const [rootNodes, setRootNodes] = useState<LoadableArray<TreeSourceNode<T>>>(initialRootNodes);
+    const [children, setChildren] = useState<StringMap<LoadableArray<TreeSourceNode<T>>>>(initialChildren);
+    const [trails, setTrails] = useState<StringMap<Array<TreeSourceNode<T>>>>(initialTrails);
 
     const statefulNodes = useRef<StringMap<TreeNode<T>>>({});
+    const sourceRef = useRef(source);
+
+    // If the source changes, reset all data and start again.
+    if (source !== sourceRef.current) {
+        sourceRef.current = source;
+        setRootNodes(initialRootNodes);
+        setChildren(initialChildren);
+        setTrails(initialTrails);
+    }
 
     const { activeId, expandedIds } = state;
 
@@ -63,6 +76,10 @@ export function useTreeLoader<T>(
     // Load root nodes immediately.
     useEffect(() => {
         source.children(null).then((loadedRootNodes) => {
+            if (source !== sourceRef.current) {
+                // The source has been changed.
+                return;
+            }
             setRootNodes({ isLoading: false, items: loadedRootNodes });
             addTrails(loadedRootNodes.map((child) => [child]));
         });
@@ -72,6 +89,10 @@ export function useTreeLoader<T>(
     useEffect(() => {
         if (activeId && !trails[activeId]) {
             source.trail(activeId).then((loadedTrail) => {
+                if (source !== sourceRef.current) {
+                    // The source has been changed.
+                    return;
+                }
                 addTrails(suffixes(loadedTrail));
             });
         }
@@ -110,13 +131,18 @@ export function useTreeLoader<T>(
                 clearTimeout(loadingTransitionTimeout as any);
             }
 
+            if (source !== sourceRef.current) {
+                // The source has been changed.
+                return;
+            }
+
             // Add the children to state.
             const loadedChildren: StringMap<LoadableArray<TreeSourceNode<T>>> = Object.fromEntries(results);
             setChildren((currentChildren) => ({ ...currentChildren, ...loadedChildren }));
 
             // Add trails for the new children so we can make them active.
             addTrails(Object.entries(loadedChildren).flatMap(
-                ([id, childrenForId]) => childrenForId.items.map((child) => [child, ...trails[id]]),
+                ([id, childrenForId]) => trails[id] ? childrenForId.items.map((child) => [child, ...trails[id]]) : [],
             ));
         });
     }, [expandedIds, children, trails, activeTrailIds, source, addTrails, setChildren, loadingTransitionMs]);

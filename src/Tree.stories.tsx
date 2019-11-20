@@ -54,6 +54,11 @@ const staticSource = staticTreeSource<Labeled>([
         children: [],
     },
     {
+        id: 'pinguin',
+        label: 'Pinguïn',
+        hasChildren: false,
+    },
+    {
         id: 'schaap',
         label: 'Schaap',
         hasChildren: true,

@@ -3,7 +3,7 @@ import { TreeSource, TreeSourceNode } from './types';
 export type StaticTreeSourceNode<T> = TreeSourceNode<T & StaticTreeSourceNodeData<T>>;
 
 interface StaticTreeSourceNodeData<T> {
-    children: Array<StaticTreeSourceNode<T>>;
+    children?: Array<StaticTreeSourceNode<T>>;
 }
 
 class StaticTreeSource<T> implements TreeSource<T> {
@@ -22,9 +22,11 @@ class StaticTreeSource<T> implements TreeSource<T> {
                 if (parentId !== null) {
                     this.childrenData[parentId].push(child);
                 }
-                const childTrail = [child, ...trail];
-                this.trailsData[child.id] = childTrail;
-                walkTree(child.children, childTrail);
+                if (child.children) {
+                    const childTrail = [child, ...trail];
+                    this.trailsData[child.id] = childTrail;
+                    walkTree(child.children, childTrail);
+                }
             }
         };
         walkTree(data, []);

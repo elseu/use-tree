@@ -234,7 +234,7 @@ stories.add('Double tree', () => {
         <>
             <TreeExampleContainer
                 source={testSource}
-                leftActiveId={text('Left active ID', 'seb')}
+                activeId={text('Left active ID', 'seb')}
                 loadingTransitionMs={number('Loading transition ms', 100)}
             />
         </>

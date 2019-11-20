@@ -87,7 +87,7 @@ Type `TreeSourceNode<T>` contains all the properties of `T` (which is a type tha
 If you have the full content of the tree available in an object and you don't need lazy loading, you can use `staticTreeSource(data)` to turn it into a `TreeSource`. Your `data` must be an array of root nodes which conform to `StaticTreeSourceNode<T>`:
 
 * All properties from `TreeSourceNode<T>`
-* `children: Array<StaticTreeSourceNode<T>>`
+* `children?: Array<StaticTreeSourceNode<T>>`
 
 ### interface TreeState
 This interface describes the current display state of a tree. It contains two properties:

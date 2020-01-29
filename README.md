@@ -71,6 +71,9 @@ Properties:
 * * `defaultState?: TreeState`: the state to start with. If you pass this, but not `state`, then `TreeContainer` will manage state internally (uncontrolled).
 * `onStateChange?: (st: TreeState) => void`: called whenever the tree state changes from within (usually through `useTreeController()`). Use this if you want to manage tree state in your own state container (like Redux).
 * `loaderOptions?: TreeLoaderOptions`: options for loading data from the tree source. See [useTreeLoader()](#usetreeloader).
+* `rootElement?: React.FC<{ tree: Tree<T> }>`: if passed, this element will be shown within the tree container. It will receive the tree as a prop.
+* `render?: (props: { tree: Tree<T> }) => ReactNode`: if passed, this function will be called and its output tree is rendered within the tree container.
+
 
 ### interface TreeSource
 Interface for a data source to fetch tree data, usually from a server. A data source should implement these two methods:

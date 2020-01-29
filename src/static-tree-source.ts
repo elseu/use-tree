@@ -22,9 +22,9 @@ class StaticTreeSource<T> implements TreeSource<T> {
                 if (parentId !== null) {
                     this.childrenData[parentId].push(child);
                 }
+                const childTrail = [child, ...trail];
+                this.trailsData[child.id] = childTrail;
                 if (child.children) {
-                    const childTrail = [child, ...trail];
-                    this.trailsData[child.id] = childTrail;
                     walkTree(child.children, childTrail);
                 }
             }

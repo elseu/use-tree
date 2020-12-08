@@ -78,7 +78,7 @@
     "rollup-plugin-peer-deps-external": "^2.2.0",
     "rollup-plugin-typescript2": "^0.24.3",
     "rollup-plugin-url": "^3.0.0",
-    "semantic-release": "^15.13.24",
+    "semantic-release": "^17.2.3",
     "storybook-addon-jsx": "^7.1.6",
     "tslint": "^5.20.0",
     "tslint-react": "^4.1.0",

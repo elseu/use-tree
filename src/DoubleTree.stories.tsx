@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Tree, TreeContainer, TreeNode, TreeState, useTreeNodeController } from 'index';
 import { TreeSource } from 'types';
 import { useTreeController } from 'use-tree-controller';
+import { objectFromEntries } from './util';
 
 /* tslint:disable:no-console */
 
@@ -81,7 +82,7 @@ const LeftListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
                 const newExpandedIds: { [k: string]: boolean } = {
                     ...expandedIds,
                     // Collapse all children at this same depth.
-                    ...Object.fromEntries(
+                    ...objectFromEntries(
                         Object.values(rootTree.allNodes) // For all nodes in the tree.
                             .filter(({ depth }) => depth === item.depth) // At the same level.
                             .map(({ id }) => [id, false]), // Create a [id]: false element in expandedIds.
@@ -177,8 +178,8 @@ function useSubTreeSource<T>(source: TreeSource<T>, rootId: string | null): Tree
                     return [];
                 }
                 return fullTrail.slice(0, rootItemIndex + 1);
-            }
-        }
+            },
+        };
     }, [source, rootId]);
 }
 

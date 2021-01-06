@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LoadableArray, RootTree, TreeNode, TreeSource, TreeSourceNode, TreeState } from './types';
+import { objectFromEntries } from './util';
 
 interface StringMap<V> {
     [k: string]: V;
@@ -63,13 +64,15 @@ export function useTreeLoader<T>(
     // Get active trail IDs from active ID.
     const activeTrailIds = useMemo(
         () => (activeId && trails[activeId]) ? trails[activeId].map((node) => node.id) : []
-    , [activeId, trails]);
+        , [activeId, trails]);
 
     // Add new trails and their sub trails.
     const addTrails = useCallback((newTrails: Array<Array<TreeSourceNode<T>>>) => {
         setTrails((currentTrails) => {
-            const newEntries = newTrails.map((trail) => [trail[0].id, trail]);
-            return newEntries.length > 0 ? { ...currentTrails, ...Object.fromEntries(newEntries) } : currentTrails;
+            const newEntries: Array<[string, Array<TreeSourceNode<T>>]> = newTrails.map(
+                (trail) => [trail[0].id, trail],
+            );
+            return newEntries.length > 0 ? { ...currentTrails, ...objectFromEntries(newEntries) } : currentTrails;
         });
     }, [setTrails]);
 
@@ -110,8 +113,8 @@ export function useTreeLoader<T>(
         }
 
         const enableChildrenLoadingState = () => {
-                setChildren((currentChildren) => ({
-                ...currentChildren, ...Object.fromEntries(idsToLoad.map((id) => [id, { isLoading: true, items: [] }])),
+            setChildren((currentChildren) => ({
+                ...currentChildren, ...objectFromEntries(idsToLoad.map((id) => [id, { isLoading: true, items: [] }])),
             }));
         };
         let loadingTransitionTimeout: unknown | null = null;
@@ -125,8 +128,10 @@ export function useTreeLoader<T>(
 
         // Load them from the source.
         Promise.all(
-            idsToLoad.map((id) => source.children(id).then((items) => [id, { loading: false, items }])),
-        ).then((results) => {
+            idsToLoad.map(
+                (id) => source.children(id).then((items) => [id, { isLoading: false, items }]),
+            ) as Array<Promise<[string, LoadableArray<TreeSourceNode<T>>]>>,
+        ).then((results: Array<[string, LoadableArray<TreeSourceNode<T>>]>) => {
             if (loadingTransitionTimeout !== null) {
                 clearTimeout(loadingTransitionTimeout as any);
             }
@@ -137,7 +142,7 @@ export function useTreeLoader<T>(
             }
 
             // Add the children to state.
-            const loadedChildren: StringMap<LoadableArray<TreeSourceNode<T>>> = Object.fromEntries(results);
+            const loadedChildren: StringMap<LoadableArray<TreeSourceNode<T>>> = objectFromEntries(results);
             setChildren((currentChildren) => ({ ...currentChildren, ...loadedChildren }));
 
             // Add trails for the new children so we can make them active.
@@ -148,7 +153,7 @@ export function useTreeLoader<T>(
     }, [expandedIds, children, trails, activeTrailIds, source, addTrails, setChildren, loadingTransitionMs]);
 
     return useMemo(() => {
-        const activeTrailIdsIndex = Object.fromEntries(activeTrailIds.map((id) => [id, true]));
+        const activeTrailIdsIndex = objectFromEntries(activeTrailIds.map((id) => [id, true]));
         const expandedIdsIndex = expandedIds || {};
 
         function buildOutputNode(node: TreeSourceNode<T>, depth: number): TreeNode<T> {

@@ -123,6 +123,7 @@ interface IListItemProps {
 }
 
 const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
+    console.log('render', item.id);
     const { toggleExpanded } = useTreeNodeController(item);
     const subItems = item.isExpanded && item.hasChildren
         ? <List tree={item.children} />

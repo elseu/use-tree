@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Tree, TreeContainer, TreeNode, TreeState, useTreeNodeController } from 'index';
 import { staticTreeSource } from 'static-tree-source';
 import { TreeSource } from 'types';
+import { useTreeNodesController } from 'use-tree-controller';
 
 /* tslint:disable:no-console */
 
@@ -18,7 +19,7 @@ function range(start: number, end: number): number[] {
     return [...Array(end - start + 1)].map((_, i) => i + start);
 }
 
-async function timeout(ms) {
+async function timeout(ms: number) {
     return new Promise((resolve) => { setTimeout(resolve, ms); });
 }
 
@@ -104,8 +105,11 @@ interface IListProps {
 }
 
 const List: React.FC<IListProps> = React.memo(({ tree }) => {
+    const { setAllExpanded } = useTreeNodesController(tree.items);
+
     return (
         <ul>
+            <button onClick={setAllExpanded}>Openklappen</button>
             {tree.isLoading ? <li>loading...</li> : null}
             {tree.items.map((item) => (
                 <ListItem item={item} key={item.id} />
@@ -119,7 +123,6 @@ interface IListItemProps {
 }
 
 const ListItem: React.FC<IListItemProps> = React.memo(({ item }) => {
-    console.log('render', item.id);
     const { toggleExpanded } = useTreeNodeController(item);
     const subItems = item.isExpanded && item.hasChildren
         ? <List tree={item.children} />

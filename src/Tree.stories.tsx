@@ -105,11 +105,11 @@ interface IListProps {
 }
 
 const List: React.FC<IListProps> = React.memo(({ tree }) => {
-    const { setAllExpanded } = useTreeNodesController(tree.items);
+    const { setMultipleExpanded } = useTreeNodesController(tree.items);
 
     return (
         <ul>
-            <button onClick={setAllExpanded}>Openklappen</button>
+            <button onClick={() => setMultipleExpanded(true)}>Openklappen</button>
             {tree.isLoading ? <li>loading...</li> : null}
             {tree.items.map((item) => (
                 <ListItem item={item} key={item.id} />

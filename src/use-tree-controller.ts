@@ -5,7 +5,7 @@ type TreeStateUpdater<T> = (state: TreeState, tree: RootTree<T>) => TreeState;
 
 export interface TreeController<T> {
     updateState(f: TreeStateUpdater<T>): void;
-    setAllExpanded(id: string[]): void;
+    setMultipleExpanded(id: string[], expanded?: boolean): void;
     toggleExpanded(id: string): void;
     setExpanded(id: string, expanded?: boolean): void;
     setActiveId(id: string | null): void;
@@ -18,7 +18,7 @@ export interface TreeNodeController {
 }
 
 export interface TreeNodesController {
-    setAllExpanded(): void;
+    setMultipleExpanded(expanded?: boolean): void;
 }
 
 export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdater<T>) => void): TreeController<T> {
@@ -43,17 +43,18 @@ export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdat
             };
         });
     };
-    obj.setAllExpanded = (ids: string[]) => {
+    obj.setMultipleExpanded = (ids: string[], expanded?: boolean) => {
         obj.updateState!(({ expandedIds, ...rest }, { allNodes }) => {
-            const nodesToOpen = Object.values(allNodes).filter(item => ids.includes(item.id));
+            const nodesToOpen = ids.map((id) => allNodes[id]).filter((item) => item);
+
             return {
                 ...rest,
                 expandedIds: {
                     ...expandedIds,
-                    ...(nodesToOpen.reduce((obj, item) => ({
-                          ...obj,
-                          [item.id]: true,
-                    }), {}))
+                    ...(nodesToOpen.reduce((obj, item) => {
+                        obj![item.id] = !!expanded;
+                        return obj;
+                    }, {} as typeof expandedIds))
                 },
             };
         });
@@ -97,8 +98,8 @@ export function useTreeNodeController(item: string | TreeSourceNode<unknown>): T
 export function useTreeNodesController(items: TreeSourceNode<unknown>[]): TreeNodesController {
     const controller = useTreeController();
     return useMemo(() => ({
-        setAllExpanded() {
-            controller.setAllExpanded(items.map(item => item.id))
+        setMultipleExpanded(expanded?: boolean) {
+            controller.setMultipleExpanded(items.map(item => item.id), expanded)
         },
     }), [controller, items]);
 }

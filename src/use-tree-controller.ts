@@ -5,6 +5,7 @@ type TreeStateUpdater<T> = (state: TreeState, tree: RootTree<T>) => TreeState;
 
 export interface TreeController<T> {
     updateState(f: TreeStateUpdater<T>): void;
+    setMultipleExpanded(id: string[], expanded?: boolean): void;
     toggleExpanded(id: string): void;
     setExpanded(id: string, expanded?: boolean): void;
     setActiveId(id: string | null): void;
@@ -14,6 +15,10 @@ export interface TreeNodeController {
     setExpanded(expanded?: boolean): void;
     toggleExpanded(): void;
     setActive(active?: boolean): void;
+}
+
+export interface TreeNodesController {
+    setMultipleExpanded(expanded?: boolean): void;
 }
 
 export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdater<T>) => void): TreeController<T> {
@@ -31,9 +36,26 @@ export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdat
             const explicitExpandedState = expandedIds ? expandedIds[id] : undefined;
             const isExpanded = (explicitExpandedState === true)
                 || (allNodes[id] && allNodes[id].isActiveTrail && explicitExpandedState === undefined);
+
             return {
                 ...rest,
                 expandedIds: { ...expandedIds, [id]: !isExpanded },
+            };
+        });
+    };
+    obj.setMultipleExpanded = (ids: string[], expanded?: boolean) => {
+        obj.updateState!(({ expandedIds, ...rest }, { allNodes }) => {
+            const nodesToOpen = ids.map((id) => allNodes[id]).filter(Boolean)
+
+            return {
+                ...rest,
+                expandedIds: {
+                    ...expandedIds,
+                    ...(nodesToOpen.reduce((obj, item) => {
+                        obj![item.id] = expanded !== false;
+                        return obj;
+                    }, {} as typeof expandedIds))
+                },
             };
         });
     };
@@ -71,4 +93,13 @@ export function useTreeNodeController(item: string | TreeSourceNode<unknown>): T
             controller.setActiveId(id);
         },
     }), [controller, id]);
+}
+
+export function useTreeNodesController(items: TreeSourceNode<unknown>[]): TreeNodesController {
+    const controller = useTreeController();
+    return useMemo(() => ({
+        setMultipleExpanded(expanded?: boolean) {
+            controller.setMultipleExpanded(items.map(item => item.id), expanded)
+        },
+    }), [controller, items]);
 }

@@ -52,7 +52,7 @@ export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdat
                 expandedIds: {
                     ...expandedIds,
                     ...(nodesToOpen.reduce((obj, item) => {
-                        obj![item.id] = !!expanded;
+                        obj![item.id] = expanded !== false;
                         return obj;
                     }, {} as typeof expandedIds))
                 },

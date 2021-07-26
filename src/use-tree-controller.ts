@@ -45,7 +45,7 @@ export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdat
     };
     obj.setMultipleExpanded = (ids: string[], expanded?: boolean) => {
         obj.updateState!(({ expandedIds, ...rest }, { allNodes }) => {
-            const nodesToOpen = ids.map((id) => allNodes[id])
+            const nodesToOpen = ids.map((id) => allNodes[id]).filter(Boolean)
 
             return {
                 ...rest,

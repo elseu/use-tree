@@ -46,10 +46,7 @@ export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdat
     obj.setMultipleExpanded = (ids: string[], expanded?: boolean) => {
         obj.updateState!(({ expandedIds, ...rest }, { allNodes }) => {
            
-            ids.map((id) => allNodes[id]).forEach(item => {
-                if (!expandedIds) return;
-                expandedIds[item.id] = !!expanded
-            })
+            ids.map(id => allNodes[id]).forEach(item => (expandedIds || {})[item.id] = !!expanded)
             
             return {
                 ...rest,

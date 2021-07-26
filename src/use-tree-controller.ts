@@ -44,13 +44,18 @@ export function treeControllerFromUpdateState<T>(updateState: (f: TreeStateUpdat
         });
     };
     obj.setMultipleExpanded = (ids: string[], expanded?: boolean) => {
-        obj.updateState!(({ expandedIds = {}, ...rest }, { allNodes }) => {
+        obj.updateState!(({ expandedIds, ...rest }, { allNodes }) => {
+            const nodesToOpen = ids.map((id) => allNodes[id])
 
-            ids.map((id) => allNodes[id]).forEach(item => expandedIds[item.id] = !!expanded)          
-            
             return {
                 ...rest,
-                expandedIds
+                expandedIds: {
+                    ...expandedIds,
+                    ...(nodesToOpen.reduce((obj, item) => {
+                        obj![item.id] = !!expanded;
+                        return obj;
+                    }, {} as typeof expandedIds))
+                },
             };
         });
     };

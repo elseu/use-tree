@@ -1,6 +1,6 @@
 import { number, text } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { Tree, TreeContainer, TreeNode, TreeState, useTreeNodeController } from 'index';
 import { staticTreeSource } from 'static-tree-source';
@@ -107,9 +107,11 @@ interface IListProps {
 const List: React.FC<IListProps> = React.memo(({ tree }) => {
     const { setMultipleExpanded } = useTreeNodesController(tree.items);
 
+    const expandAll = useCallback(() => setMultipleExpanded(), [setMultipleExpanded]);
+
     return (
         <ul>
-            <button onClick={() => setMultipleExpanded(true)}>Openklappen</button>
+            <button onClick={expandAll}>Openklappen</button>
             {tree.isLoading ? <li>loading...</li> : null}
             {tree.items.map((item) => (
                 <ListItem item={item} key={item.id} />

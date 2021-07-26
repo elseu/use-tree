@@ -14,6 +14,7 @@ With `useTree` you can focus on how to render your tree structure and forget abo
   - [interface TreeState](#interface-treestate)
   - [useTreeController()](#usetreecontroller)
   - [useTreeNodeController(id: string)](#usetreenodecontrollerid-string)
+  - [useTreeNodesController(ids: string[])](#usetreenodescontrollerids-string)
   - [useTreeContent()](#usetreecontent)
   - [useTreeLoader()](#usetreeloader)
 - [Rendering a tree](#rendering-a-tree)
@@ -56,7 +57,7 @@ What `TreeContainer` will do for you is:
 
 * `TreeContainer`: the easiest entry point for normal use. Wrap this around your component, pass a data source of interface `TreeSource`, and you're usually good to go.
 * `useTreeLoader()`: take a source and the current tree state and load data from the source to expand the tree, returning a simple an up-to-date data structure with tree data.
-* `useTreeController()` / `useTreeNodeController(id: string)`: return an object that allows you to control the state of the current tree (from context).
+* `useTreeController()` / `useTreeNodeController(id: string)` / `useTreeNodesController(ids: string[])`: return an object that allows you to control the state of the current tree (from context).
 * `useTreeContent()`: return the data for the current tree (from context).
 
 We will now describe these in more detail.
@@ -112,6 +113,11 @@ Same as `useTreeController()`, but only for one tree node. You should, for insta
 * `setExpanded(expanded?: boolean): void`.
 * `toggleExpanded(): void`.
 * `setActive(active?: boolean): void`.
+
+### useTreeNodesController(ids: string[])
+Same as `useTreeNodeController()`, but for multiple tree nodes. Not all methods make sense, so it only provides:
+
+* `setMultipleExpanded(expanded?: boolean): void`.
 
 ### useTreeContent()
 When used inside the context of a tree, returns the current data of the tree. This can be used if you have several components nested inside your `<TreeContainer>` that all want to display the tree (or parts thereof).

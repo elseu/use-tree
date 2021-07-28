@@ -20,6 +20,7 @@ export {
     TreeControllerContext,
     useTreeController,
     useTreeNodeController,
+    useTreeNodesController
 } from './use-tree-controller';
 export {
     staticTreeSource,

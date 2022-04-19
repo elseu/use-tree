@@ -2,8 +2,8 @@
   "name": "use-tree",
   "license": "MIT",
   "peerDependencies": {
-    "react": ">16",
-    "react-dom": ">16"
+    "react": ">=16",
+    "react-dom": ">=16"
   },
   "author": {
     "name": "Sebastiaan Besselsen",

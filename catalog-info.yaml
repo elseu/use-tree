@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1beta1
+kind: Component
+metadata:
+  name: use-tree
+  description: "React components for tree structures"
+  annotations:
+    github.com/project-slug: elseu/use-tree
+    backstage.io/source-location: url:https://github.com/elseu/use-tree/
+  tags:
+    - typescript
+spec:
+  type: unspecified
+  owner: unknown
+  lifecycle: unspecified
